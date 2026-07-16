@@ -1,5 +1,5 @@
 {
-  "version": "1.0.0",
+  "version": "1.0.1",
   "mods": [
     {
       "nome": "accessories-fabric-1.1.0-beta.53+1.21.1.jar",
@@ -115,16 +115,6 @@
       "nome": "catchrate-display-fabric-2.7.8.jar",
       "arquivo": "catchrate-display-fabric-2.7.8.jar",
       "url": "https://github.com/inosukeme196-ai/cobblemon-mods/releases/download/v1.0.0/catchrate-display-fabric-2.7.8.jar"
-    },
-    {
-      "nome": "cc-tweaked-1.21.1-fabric-1.120.0.jar",
-      "arquivo": "cc-tweaked-1.21.1-fabric-1.120.0.jar",
-      "url": "https://github.com/inosukeme196-ai/cobblemon-mods/releases/download/v1.0.0/cc-tweaked-1.21.1-fabric-1.120.0.jar"
-    },
-    {
-      "nome": "ccterminals-1.21.1-fabric-0.1.0.jar",
-      "arquivo": "ccterminals-1.21.1-fabric-0.1.0.jar",
-      "url": "https://github.com/inosukeme196-ai/cobblemon-mods/releases/download/v1.0.0/ccterminals-1.21.1-fabric-0.1.0.jar"
     },
     {
       "nome": "chatanimation-fabric-1.21.1-1.1.3.jar",
