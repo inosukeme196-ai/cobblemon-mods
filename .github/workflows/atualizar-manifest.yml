@@ -1,14 +1,20 @@
 name: Atualizar manifest.json
 
-# "on" define quando esse robô deve rodar sozinho.
+# "on" define quando esse robô deve rodar.
 # - published: quando alguém publica um Release NOVO.
-# - edited: quando alguém edita um Release que já existia
-#   (por exemplo, adiciona ou remove um arquivo .jar dele).
-# Com os dois aqui, não importa se você cria um Release novo ou edita um
-# antigo — o robô roda do mesmo jeito e gera o manifest.json atualizado.
+# - edited: quando alguém edita um Release que já existia.
+# - workflow_dispatch: adiciona um botão "Run workflow" na aba Actions,
+#   pra você poder rodar o robô manualmente a qualquer momento, sem
+#   precisar mexer em Release nenhuma. Útil pra testar.
 on:
   release:
     types: [published, edited]
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: 'Tag da Release a usar (ex: v1.0.0) — só é usada quando você roda manualmente'
+        required: true
+        default: 'v1.0.0'
 
 permissions:
   contents: write
@@ -23,11 +29,15 @@ jobs:
       - name: Gerar manifest.json a partir dos arquivos do Release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          RELEASE_TAG: ${{ github.event.release.tag_name }}
+          # Se o robô rodou por causa de uma Release (publicada/editada), usa
+          # a tag dessa Release. Se foi você que clicou em "Run workflow" à
+          # mão, usa a tag que você digitou na caixinha.
+          RELEASE_TAG: ${{ github.event.release.tag_name || github.event.inputs.release_tag }}
         run: |
-          # Pergunta pro GitHub quais arquivos (.jar) estão dentro desse Release.
-          # "jq" é usado pra ler a resposta (que vem em formato JSON) e montar
-          # o manifest.json do jeito que o launcher espera.
+          echo "Usando a Release: $RELEASE_TAG"
+          # Guarda o valor pra ele continuar disponível no próximo step também.
+          echo "RELEASE_TAG=$RELEASE_TAG" >> "$GITHUB_ENV"
+
           gh release view "$RELEASE_TAG" --json assets \
             --jq '{
               version: "'"$RELEASE_TAG"'",
@@ -42,6 +52,5 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add manifest.json
-          # Só faz o commit se algo realmente mudou, pra não gerar commits vazios.
-          git diff --cached --quiet || git commit -m "Atualizar manifest.json (Release: ${{ github.event.release.tag_name }})"
+          git diff --cached --quiet || git commit -m "Atualizar manifest.json (Release: $RELEASE_TAG)"
           git push
