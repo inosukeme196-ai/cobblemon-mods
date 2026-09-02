@@ -1,11 +1,5 @@
 name: Atualizar manifest.json
 
-# "on" define quando esse robô deve rodar.
-# - published: quando alguém publica um Release NOVO.
-# - edited: quando alguém edita um Release que já existia.
-# - workflow_dispatch: adiciona um botão "Run workflow" na aba Actions,
-#   pra você poder rodar o robô manualmente a qualquer momento, sem
-#   precisar mexer em Release nenhuma. Útil pra testar.
 on:
   release:
     types: [published, edited]
@@ -29,19 +23,16 @@ jobs:
       - name: Gerar manifest.json a partir dos arquivos do Release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          # Se o robô rodou por causa de uma Release (publicada/editada), usa
-          # a tag dessa Release. Se foi você que clicou em "Run workflow" à
-          # mão, usa a tag que você digitou na caixinha.
           RELEASE_TAG: ${{ github.event.release.tag_name || github.event.inputs.release_tag }}
         run: |
           echo "Usando a Release: $RELEASE_TAG"
-          # Guarda o valor pra ele continuar disponível no próximo step também.
           echo "RELEASE_TAG=$RELEASE_TAG" >> "$GITHUB_ENV"
 
           gh release view "$RELEASE_TAG" --json assets \
             --jq '{
               version: "'"$RELEASE_TAG"'",
-              mods: [.assets[] | select(.name | endswith(".jar")) | {arquivo: .name, url: .url}]
+              mods: [.assets[] | select(.name | endswith(".jar")) | {arquivo: .name, url: .url}],
+              resourcepacks: [.assets[] | select(.name | endswith(".zip")) | {arquivo: .name, url: .url}]
             }' > manifest.json
 
           echo "Conteúdo gerado:"
